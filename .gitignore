@@ -1,0 +1,25 @@
+# Ignore node_modules
+node_modules/
+.npm/
+.pnpm/
+.yarn/
+
+# Ignore environment files
+.env
+.env.local
+.env.development
+.env.production
+.env.test
+
+# Ignore build files
+dist/
+build/
+
+# Ignore logs
+logs/
+*.log
+
+# Ignore editor settings
+.vscode/
+.idea/
+.DS_Store

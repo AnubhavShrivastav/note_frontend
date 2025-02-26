@@ -1,0 +1,261 @@
+import { useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
+import API from "../axiosConfig";
+
+function Home() {
+  //useState
+  const [notes, setNotes] = useState([]);
+  const [usedColors, setUsedColors] = useState([]);
+  const [loading, setLoading] = useState(false);
+  const [user, setUser] = useState("");
+
+  const navigate = useNavigate();
+
+ 
+  //array of notes color
+  const colors = [
+    "bg-pink-200 border border-pink-300 shadow-sm",
+    "bg-blue-200 border border-blue-300 shadow-sm",
+    "bg-green-200 border border-green-300 shadow-sm",
+    "bg-yellow-200 border border-yellow-300 shadow-sm",
+    "bg-purple-200 border border-purple-300 shadow-sm",
+    "bg-orange-200 border border-orange-300 shadow-sm",
+    "bg-teal-200 border border-teal-300 shadow-sm",
+    "bg-gray-200 border border-gray-300 shadow-sm",
+  ];
+
+  // Get a unique random color
+  const getUniqueColor = () => {
+    const availableColors = colors.filter(
+      (color) => !usedColors.includes(color)
+    );
+    const randomColor =
+      availableColors[Math.floor(Math.random() * availableColors.length)];
+
+    setUsedColors((prev) => [...prev, randomColor]);
+    if (usedColors.length === colors.length - 1) {
+      setUsedColors([]);
+    }
+
+    return randomColor;
+  };
+
+  // Add new note
+  const addNote = () => {
+    setNotes([
+      ...notes,
+      {
+        _id: notes.length + 1,
+        content: "",
+        date: new Date().toISOString().split("T")[0],
+        color: getUniqueColor(),
+      },
+    ]);
+  };
+
+  // Update a note
+  const updateNote = (id, newContent) => {
+    setNotes((prevNotes) =>
+      prevNotes.map((note) =>
+        note._id === id ? { ...note, content: newContent } : note
+      )
+    );
+  };
+
+  // Function to delete a note
+  // const deleteNote = (id) => {
+  //   setNotes(notes.filter((note) => note.id !== id));
+  // };
+
+
+  // Save note to MongoDB (POST API)
+  const saveNote = async (_id, content) => {
+    const date = new Date().toISOString().split("T")[0]; // Send consistent date format
+
+    if (!content.trim()) {
+      alert("⚠️ Note cannot be empty!");
+      return;
+    }
+
+    try {
+      const res = await API.post("http://localhost:3000/notes", {
+        description: content,
+        createdAt: date,
+      });
+      console.log("✅ Response received:", res.data);
+      alert("✅ Note saved!");
+    } catch (err) {
+      console.error("❌ Error:", err.response ? err.response.data : err);
+      alert("❌ Error saving note!");
+    }
+  };
+
+
+  //  Fetch notes from MongoDB when the page loads (GET API)
+  useEffect(() => {
+    const fetchNotes = async () => {
+      try {
+        const res = await API.get("http://localhost:3000/notes");
+        const filteredNotes = res.data.filter((note) => !note.deletedAt); // Ignore deleted notes
+        setNotes(filteredNotes);
+
+        console.log("📄 Notes from DB:", res.data); // Debugging
+        setNotes(res.data);
+
+        // 🎨 Assign Colors to Notes (each note gets a unique color)
+        const notesWithColors = res.data.map((note, index) => ({
+          ...note,
+          color: colors[index % colors.length], // Cycle through colors
+        }));
+
+        setNotes(notesWithColors);
+      } catch (err) {
+        console.error("❌ Error fetching notes:", err);
+      }
+    };
+    fetchNotes();
+  }, []);
+
+
+  // update the note in db (UPDATE API)
+  const updateNoteInDB = async (id, content) => {
+    if (!content.trim()) {
+      alert("⚠️ Note cannot be empty!");
+      return;
+    }
+
+    try {
+      setLoading(true);
+      const res = await API.put(`http://localhost:3000/notes/${id}`, {
+        description: content,
+      });
+      alert("✅ Note updated successfully!");
+      console.log(res.data);
+    } catch (err) {
+      console.error(
+        "❌ Error updating note:",
+        err.response ? err.response.data : err
+      );
+      alert("❌ Failed to update note!");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  // Delete a note from MongoDB and frontend (DELETE API)
+  const deleteNote = async (id) => {
+    console.log("🛠️ Deleting note with ID:", id); // Debugging
+    if (!id) {
+      alert("❌ Error: ID is undefined!");
+      return;
+    }
+
+    try {
+      const res = await API.delete(`http://localhost:3000/notes/${id}`);
+      setNotes((prevNotes) => prevNotes.filter((note) => note._id !== id));
+      alert(res.data.message);
+    } catch (err) {
+      console.error(
+        "❌ Error deleting note:",
+        err.response ? err.response.data : err
+      );
+      alert("❌ Failed to delete note!");
+    }
+  };
+
+  // Store the data in local storage
+  useEffect(() => {
+    // Get user name from localStorage
+    const userName = localStorage.getItem("userName");
+    console.log("Stored User Name:", userName); // Debugging
+
+    if (userName) {
+      setUser(userName);
+    }
+  }, []);
+
+
+  //delete the data in local storage
+  const handleLogout = () => {
+    localStorage.removeItem("authToken"); // Remove token
+    localStorage.removeItem("userName");
+    localStorage.removeItem("user"); //  Remove user data
+    navigate("/");
+  };
+
+  return (
+    <div className="flex  h-screen bg-white ">
+      <div className="w-28 bg-slate-50 shadow-md flex flex-col items-center py-6">
+        <button className="mb-52 ml-5">
+          <img src="/images/Logo-3.png" />
+        </button>
+
+        <button className="mb-6 -ml-7">
+          <img src="/images/House.png" />
+        </button>
+
+        <button onClick={addNote} className="mb-6 pl-2">
+          <img src="/images/plus.svg" />
+        </button>
+
+        <button onClick={handleLogout} className="mt-auto ml-3">
+          <img src="/images/log-out.svg" />
+        </button>
+      </div>
+
+      <div className="mt-5 ml-36">
+        {/* <a href="#">
+        <img className="mr-1 mt-2" src="/images/search.png" />
+      </a> */}
+        <input
+          className="w-full max-w-lg px-1 py-2  rounded-lg focus:outline-none focus:ring-2 focus:ring-gray-300"
+          type="text"
+          placeholder="Search Notes"
+        />
+        {/* <a href="">
+        <img className="flex ml-96" src="/images/Dark Mode.png" />
+      </a> */}
+      </div>
+
+      <div className="mt-28 -ml-48">
+        <h1 className="text-3xl mb-2">
+          Hello,{" "}
+          <p className="font-bold inline-block">{user ? user : "Guest"}!</p>👋🏻
+        </h1>
+        <p className="text-gray-700">All your notes are here, in one place!</p>
+      </div>
+
+      <div className="grid grid-cols-4 gap-16 mt-56 -ml-80">
+        {notes.map((note) => (
+          <div key={note._id}>
+            <textarea
+              className={`w-52 h-48 pl-5 pr-5 pt-4 pb-4 mb-1 resize-none ${note.color} rounded-md block`}
+              placeholder="Write your note..."
+              value={note.description}
+              onChange={(e) => updateNote(note._id, e.target.value)} //Updates the correct note
+            >
+              {note.description}
+            </textarea>
+
+            <button onClick={() => deleteNote(note._id)}>
+              <img src="/images/trash-2.svg" />
+            </button>
+
+            <button onClick={() => saveNote(note._id, note.content)}>
+              <img src="/images/save.svg" />
+            </button>
+
+            <button
+              onClick={() => updateNoteInDB(note._id, note.content)}
+              disabled={loading}
+            >
+              <img src="/images/edit.png" className="h-6 ml-1" />
+            </button>
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+}
+
+export default Home;
