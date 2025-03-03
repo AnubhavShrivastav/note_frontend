@@ -11,7 +11,6 @@ function Home() {
 
   const navigate = useNavigate();
 
- 
   //array of notes color
   const colors = [
     "bg-pink-200 border border-pink-300 shadow-sm",
@@ -54,10 +53,10 @@ function Home() {
   };
 
   // Update a note
-  const updateNote = (id, newContent) => {
+  const updateNote = (_id, Content) => {
     setNotes((prevNotes) =>
       prevNotes.map((note) =>
-        note._id === id ? { ...note, content: newContent } : note
+        note._id === _id ? { ...note, description: Content } : note
       )
     );
   };
@@ -67,35 +66,24 @@ function Home() {
   //   setNotes(notes.filter((note) => note.id !== id));
   // };
 
-
-  // Save note to MongoDB (POST API)
-  const saveNote = async (_id, content) => {
-    const date = new Date().toISOString().split("T")[0]; // Send consistent date format
-
-    if (!content.trim()) {
-      alert("⚠️ Note cannot be empty!");
-      return;
-    }
-
-    try {
-      const res = await API.post("http://localhost:3000/notes", {
-        description: content,
-        createdAt: date,
-      });
-      console.log("✅ Response received:", res.data);
-      alert("✅ Note saved!");
-    } catch (err) {
-      console.error("❌ Error:", err.response ? err.response.data : err);
-      alert("❌ Error saving note!");
-    }
-  };
-
-
   //  Fetch notes from MongoDB when the page loads (GET API)
   useEffect(() => {
     const fetchNotes = async () => {
+      const token = localStorage.getItem("Token"); // Get token from local storage
+      console.log("🔑 Token from LocalStorage:", token); // Debugging
+
+      if (!token) {
+        console.error("❌ No Token Found");
+        return;
+      }
+
       try {
-        const res = await API.get("http://localhost:3000/notes");
+        const res = await API.get("http://localhost:3000/notes", {
+          headers: {
+            Authorization: `Bearer ${token}`,
+            "Content-Type": "application/json",
+          },
+        });
         const filteredNotes = res.data.filter((note) => !note.deletedAt); // Ignore deleted notes
         setNotes(filteredNotes);
 
@@ -116,19 +104,58 @@ function Home() {
     fetchNotes();
   }, []);
 
+  // Save note to MongoDB (POST API)
+  const saveNote = async (_id, content) => {
+    const date = new Date().toISOString().split("T")[0]; // Send consistent date format
 
-  // update the note in db (UPDATE API)
-  const updateNoteInDB = async (id, content) => {
     if (!content.trim()) {
       alert("⚠️ Note cannot be empty!");
       return;
     }
 
+    const token = localStorage.getItem("Token");
+    console.log("🔑 Token before POST request:", token); // Debugging
+
+    if (!token) {
+      console.error("❌ No token found");
+      return;
+    }
+
+    try {
+      const res = await API.post(
+        "http://localhost:3000/notes",
+        { description: content, createdAt: date },
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+            "Content-Type": "application/json",
+          },
+        }
+      );
+      console.log("✅ Response received:", res.data);
+      alert("✅ Note saved!");
+    } catch (err) {
+      console.error("❌ Error:", err.response ? err.response.data : err);
+      alert("❌ Error saving note!");
+    }
+  };
+
+  // update the note in db (UPDATE API)
+  const updateNoteInDB = async (_id, content) => {
+    if (!content.trim() || !content) {
+      alert("⚠️ Note cannot be empty!");
+      return;
+    }
+
+    const token = localStorage.getItem("Token");
+
     try {
       setLoading(true);
-      const res = await API.put(`http://localhost:3000/notes/${id}`, {
-        description: content,
-      });
+      const res = await API.put(
+        `http://localhost:3000/notes/${_id}`,
+        { description: content },
+        { headers: { Authorization: `Bearer ${token}`, "Content-Type": "application/json" } }
+      );
       alert("✅ Note updated successfully!");
       console.log(res.data);
     } catch (err) {
@@ -143,16 +170,20 @@ function Home() {
   };
 
   // Delete a note from MongoDB and frontend (DELETE API)
-  const deleteNote = async (id) => {
-    console.log("🛠️ Deleting note with ID:", id); // Debugging
-    if (!id) {
+  const deleteNote = async (_id) => {
+    console.log("🛠️ Deleting note with ID:", _id); // Debugging
+    if (!_id) {
       alert("❌ Error: ID is undefined!");
       return;
     }
 
+    const token = localStorage.getItem("Token");
+
     try {
-      const res = await API.delete(`http://localhost:3000/notes/${id}`);
-      setNotes((prevNotes) => prevNotes.filter((note) => note._id !== id));
+      const res = await API.delete(`http://localhost:3000/notes/${_id}`, {
+        headers: { Authorization: `Bearer ${token}, "Content-Type": "application/json" ` },
+      });
+      setNotes((prevNotes) => prevNotes.filter((note) => note._id !== _id));
       alert(res.data.message);
     } catch (err) {
       console.error(
@@ -174,10 +205,9 @@ function Home() {
     }
   }, []);
 
-
   //delete the data in local storage
   const handleLogout = () => {
-    localStorage.removeItem("authToken"); // Remove token
+    localStorage.removeItem("Token"); // Remove token
     localStorage.removeItem("userName");
     localStorage.removeItem("user"); //  Remove user data
     navigate("/");
@@ -241,12 +271,12 @@ function Home() {
               <img src="/images/trash-2.svg" />
             </button>
 
-            <button onClick={() => saveNote(note._id, note.content)}>
+            <button onClick={() => saveNote(note._id, note.description)}>
               <img src="/images/save.svg" />
             </button>
 
             <button
-              onClick={() => updateNoteInDB(note._id, note.content)}
+              onClick={() => updateNoteInDB(note._id, note.description)}
               disabled={loading}
             >
               <img src="/images/edit.png" className="h-6 ml-1" />

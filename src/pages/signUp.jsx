@@ -30,7 +30,7 @@ function SignUp() {
     try {
       const res = await axios.post("http://localhost:3000/users", formData);
       const { token, user } = res.data; // Receive token and user data from backend
-      localStorage.setItem("authToken", token); // Store token in localStorage
+      localStorage.setItem("Token", token); // Store token in localStorage
       localStorage.setItem("user", JSON.stringify(user)); // Store user data in localStorage
       localStorage.setItem("userName", res.data.user.name); // Ensure name is stored
 
