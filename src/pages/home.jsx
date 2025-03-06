@@ -5,38 +5,27 @@ import API from "../axiosConfig";
 function Home() {
   //useState
   const [notes, setNotes] = useState([]);
-  const [usedColors, setUsedColors] = useState([]);
   const [loading, setLoading] = useState(false);
   const [user, setUser] = useState("");
 
   const navigate = useNavigate();
 
-  //array of notes color
-  const colors = [
-    "bg-pink-200 border border-pink-300 shadow-sm",
-    "bg-blue-200 border border-blue-300 shadow-sm",
-    "bg-green-200 border border-green-300 shadow-sm",
-    "bg-yellow-200 border border-yellow-300 shadow-sm",
-    "bg-purple-200 border border-purple-300 shadow-sm",
-    "bg-orange-200 border border-orange-300 shadow-sm",
-    "bg-teal-200 border border-teal-300 shadow-sm",
-    "bg-gray-200 border border-gray-300 shadow-sm",
-  ];
-
   // Get a unique random color
-  const getUniqueColor = () => {
-    const availableColors = colors.filter(
-      (color) => !usedColors.includes(color)
-    );
-    const randomColor =
-      availableColors[Math.floor(Math.random() * availableColors.length)];
+  const getRandomColor = () => {
+    const colors = [
+      "bg-pink-200 border border-pink-300 shadow-sm",
+      "bg-blue-200 border border-blue-300 shadow-sm",
+      "bg-green-200 border border-green-300 shadow-sm",
+      "bg-yellow-200 border border-yellow-300 shadow-sm",
+      "bg-purple-200 border border-purple-300 shadow-sm",
+      "bg-orange-200 border border-orange-300 shadow-sm",
+      "bg-teal-200 border border-teal-300 shadow-sm",
+      "bg-gray-200 border border-gray-300 shadow-sm",
+    ];
 
-    setUsedColors((prev) => [...prev, randomColor]);
-    if (usedColors.length === colors.length - 1) {
-      setUsedColors([]);
-    }
+    return colors[Math.floor(Math.random() * colors.length)];
 
-    return randomColor;
+    
   };
 
   // Add new note
@@ -47,7 +36,7 @@ function Home() {
         _id: notes.length + 1,
         content: "",
         date: new Date().toISOString().split("T")[0],
-        color: getUniqueColor(),
+        color: getRandomColor(),
       },
     ]);
   };
@@ -89,14 +78,6 @@ function Home() {
 
         console.log("📄 Notes from DB:", res.data); // Debugging
         setNotes(res.data);
-
-        // 🎨 Assign Colors to Notes (each note gets a unique color)
-        const notesWithColors = res.data.map((note, index) => ({
-          ...note,
-          color: colors[index % colors.length], // Cycle through colors
-        }));
-
-        setNotes(notesWithColors);
       } catch (err) {
         console.error("❌ Error fetching notes:", err);
       }
@@ -105,7 +86,7 @@ function Home() {
   }, []);
 
   // Save note to MongoDB (POST API)
-  const saveNote = async (_id, content) => {
+  const saveNote = async (_id, content, color) => {
     const date = new Date().toISOString().split("T")[0]; // Send consistent date format
 
     if (!content.trim()) {
@@ -124,7 +105,7 @@ function Home() {
     try {
       const res = await API.post(
         "http://localhost:3000/notes",
-        { description: content, createdAt: date },
+        { description: content, createdAt: date, color },
         {
           headers: {
             Authorization: `Bearer ${token}`,
@@ -154,7 +135,12 @@ function Home() {
       const res = await API.put(
         `http://localhost:3000/notes/${_id}`,
         { description: content },
-        { headers: { Authorization: `Bearer ${token}`, "Content-Type": "application/json" } }
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+            "Content-Type": "application/json",
+          },
+        }
       );
       alert("✅ Note updated successfully!");
       console.log(res.data);
@@ -181,7 +167,9 @@ function Home() {
 
     try {
       const res = await API.delete(`http://localhost:3000/notes/${_id}`, {
-        headers: { Authorization: `Bearer ${token}, "Content-Type": "application/json" ` },
+        headers: {
+          Authorization: `Bearer ${token}, "Content-Type": "application/json" `,
+        },
       });
       setNotes((prevNotes) => prevNotes.filter((note) => note._id !== _id));
       alert(res.data.message);
@@ -259,7 +247,7 @@ function Home() {
         {notes.map((note) => (
           <div key={note._id}>
             <textarea
-              className={`w-52 h-48 pl-5 pr-5 pt-4 pb-4 mb-1 resize-none ${note.color} rounded-md block`}
+              className={`w-52 h-48 pl-5 pr-5 pt-4 pb-2 mb-1 resize-none ${note.color} rounded-md block`}
               placeholder="Write your note..."
               value={note.description}
               onChange={(e) => updateNote(note._id, e.target.value)} //Updates the correct note
@@ -271,7 +259,9 @@ function Home() {
               <img src="/images/trash-2.svg" />
             </button>
 
-            <button onClick={() => saveNote(note._id, note.description)}>
+            <button
+              onClick={() => saveNote(note._id, note.description, note.color)}
+            >
               <img src="/images/save.svg" />
             </button>
 
