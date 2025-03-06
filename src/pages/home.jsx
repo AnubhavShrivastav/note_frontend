@@ -7,6 +7,7 @@ function Home() {
   const [notes, setNotes] = useState([]);
   const [loading, setLoading] = useState(false);
   const [user, setUser] = useState("");
+  const [search, setSearch] = useState("");
 
   const navigate = useNavigate();
 
@@ -24,8 +25,6 @@ function Home() {
     ];
 
     return colors[Math.floor(Math.random() * colors.length)];
-
-    
   };
 
   // Add new note
@@ -226,10 +225,13 @@ function Home() {
         <img className="mr-1 mt-2" src="/images/search.png" />
       </a> */}
         <input
-          className="w-full max-w-lg px-1 py-2  rounded-lg focus:outline-none focus:ring-2 focus:ring-gray-300"
+          className="w-full max-w-lg px-2 py-2  rounded-lg focus:outline-none focus:ring-2 focus:ring-gray-300"
           type="text"
           placeholder="Search Notes"
+          value={search}
+          onChange={(e) => setSearch(e.target.value)}
         />
+        
         {/* <a href="">
         <img className="flex ml-96" src="/images/Dark Mode.png" />
       </a> */}
@@ -244,7 +246,12 @@ function Home() {
       </div>
 
       <div className="grid grid-cols-4 gap-16 mt-56 -ml-80">
-        {notes.map((note) => (
+        
+      {notes
+          .filter((note) =>
+            note.description.toLowerCase().includes(search.toLowerCase())
+          )
+          .map((note) => (
           <div key={note._id}>
             <textarea
               className={`w-52 h-48 pl-5 pr-5 pt-4 pb-2 mb-1 resize-none ${note.color} rounded-md block`}
@@ -252,6 +259,8 @@ function Home() {
               value={note.description}
               onChange={(e) => updateNote(note._id, e.target.value)} //Updates the correct note
             >
+
+             
               {note.description}
             </textarea>
 
