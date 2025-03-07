@@ -33,7 +33,7 @@ function Home() {
       ...notes,
       {
         _id: notes.length + 1,
-        content: "",
+        description: "",
         date: new Date().toISOString().split("T")[0],
         color: getRandomColor(),
       },
