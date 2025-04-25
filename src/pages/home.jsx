@@ -231,7 +231,7 @@ function Home() {
           value={search}
           onChange={(e) => setSearch(e.target.value)}
         />
-        
+
         {/* <a href="">
         <img className="flex ml-96" src="/images/Dark Mode.png" />
       </a> */}
@@ -246,42 +246,39 @@ function Home() {
       </div>
 
       <div className="grid grid-cols-4 gap-16 mt-56 -ml-80">
-        
-      {notes
+        {notes
           .filter((note) =>
             note.description.toLowerCase().includes(search.toLowerCase())
           )
           .map((note) => (
-          <div key={note._id}>
-            <textarea
-              className={`w-52 h-48 pl-5 pr-5 pt-4 pb-2 mb-1 resize-none ${note.color} rounded-md block`}
-              placeholder="Write your note..."
-              value={note.description}
-              onChange={(e) => updateNote(note._id, e.target.value)} //Updates the correct note
-            >
+            <div key={note._id}>
+              <textarea
+                className={`w-52 h-48 pl-5 pr-5 pt-4 pb-2 mb-1 resize-none ${note.color} rounded-md block`}
+                placeholder="Write your note..."
+                value={note.description}
+                onChange={(e) => updateNote(note._id, e.target.value)} //Updates the correct note
+              >
+                {note.description}
+              </textarea>
 
-             
-              {note.description}
-            </textarea>
+              <button onClick={() => deleteNote(note._id)}>
+                <img src="/images/trash-2.svg" />
+              </button>
 
-            <button onClick={() => deleteNote(note._id)}>
-              <img src="/images/trash-2.svg" />
-            </button>
+              <button
+                onClick={() => saveNote(note._id, note.description, note.color)}
+              >
+                <img src="/images/save.svg" />
+              </button>
 
-            <button
-              onClick={() => saveNote(note._id, note.description, note.color)}
-            >
-              <img src="/images/save.svg" />
-            </button>
-
-            <button
-              onClick={() => updateNoteInDB(note._id, note.description)}
-              disabled={loading}
-            >
-              <img src="/images/edit.png" className="h-6 ml-1" />
-            </button>
-          </div>
-        ))}
+              <button
+                onClick={() => updateNoteInDB(note._id, note.description)}
+                disabled={loading}
+              >
+                <img src="/images/edit.png" className="h-6 ml-1" />
+              </button>
+            </div>
+          ))}
       </div>
     </div>
   );

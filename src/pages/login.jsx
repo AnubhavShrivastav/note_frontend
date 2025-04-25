@@ -1,6 +1,6 @@
 import React from "react";
 import { useState } from "react";
-import { useNavigate,Link } from "react-router-dom";
+import { useNavigate, Link } from "react-router-dom";
 import axios from "axios";
 
 function Login() {
@@ -22,23 +22,24 @@ function Login() {
     if (!formData.email || !formData.password) {
       alert("⚠️ All fields are required!");
       return;
-    }  
+    }
 
     try {
-    const res = await axios.post("http://localhost:3000/users/login", formData);
+      const res = await axios.post(
+        "http://localhost:3000/users/login",
+        formData
+      );
 
-    const { token, user } = res.data;
-    localStorage.setItem("Token", token); // ✅ Store token
-    localStorage.setItem("user", JSON.stringify(user)); // ✅ Store user data
-    localStorage.setItem('userName',res.data.user.name)
-
+      const { token, user } = res.data;
+      localStorage.setItem("Token", token); // ✅ Store token
+      localStorage.setItem("user", JSON.stringify(user)); // ✅ Store user data
+      localStorage.setItem("userName", res.data.user.name);
 
       alert("✅ Login successfully");
       navigate("/home"); // Redirect to Home Page
     } catch (err) {
-      alert( err.response?.data?.msg);
-      console.error('Login failed:', err.response?.data?.message);
-
+      alert(err.response?.data?.msg);
+      console.error("Login failed:", err.response?.data?.message);
     }
   };
 
@@ -86,7 +87,10 @@ function Login() {
           </button>
         </form>
         <p className="ml-64">
-          Don't have an account? <Link className="text-blue-900" to="./signUp">Sign up</Link>
+          Don't have an account?{" "}
+          <Link className="text-blue-900" to="./signUp">
+            Sign up
+          </Link>
         </p>
       </div>
     </div>

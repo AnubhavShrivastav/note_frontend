@@ -1,7 +1,7 @@
 import axios from "axios";
 
 const API = axios.create({
-  baseURL: "http://localhost:3000/notes",
+  baseURL: import.meta.env.VITE_API_URL,
 });
 
 // Attach token to every request

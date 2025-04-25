@@ -34,7 +34,6 @@ function SignUp() {
       localStorage.setItem("user", JSON.stringify(user)); // Store user data in localStorage
       localStorage.setItem("userName", res.data.user.name); // Ensure name is stored
 
-
       alert("✅ Login successfully");
       navigate("/home"); // Redirect to Home Page
     } catch (err) {
@@ -126,7 +125,10 @@ function SignUp() {
 
         <p className="ml-72">
           Have an account?
-          <Link className="text-blue-900" to="/"> Log in</Link>
+          <Link className="text-blue-900" to="/">
+            {" "}
+            Log in
+          </Link>
         </p>
       </div>
     </div>
