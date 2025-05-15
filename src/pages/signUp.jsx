@@ -42,88 +42,95 @@ function SignUp() {
   };
 
   return (
-    <div className="flex container h-screen w-screen">
-      <div className="flex-1 content-center">
-        <img className="mt-32 ml-auto mr-52" src="/images/Group 9.png" />
+    <div className="flex flex-col md:flex-row container min-h-screen w-screen">
+      <div className="flex-1 content-center text-center md:text-left">
+        <img className="mt-12 md:mt-32 md:ml-auto md:mr-52 mx-auto" src="/images/Group 9.png" />
 
-        <h1 className="mt-10 ml-40 font-semibold text-4xl">Keep Life simple</h1>
+        <h1 className="mt-6 md:mt-10 md:ml-40 font-semibold text-3xl md:text-4xl">
+          Keep Life simple
+        </h1>
 
-        <p className="mt-4 ml-40 text-gray-500">
-          Store all your in a simple and intuitive <br /> app that helps you
-          enjoy what is <br /> most important in life.
+        <p className="mt-2 md:mt-4 md:ml-40 text-gray-500 text-sm md:text-base">
+          Store all your in a simple and intuitive <br className="hidden md:block" /> app that helps you
+          enjoy what is <br className="hidden md:block" /> most important in life.
         </p>
       </div>
 
-      <div className="flex-1 content-center bg-slate-100">
+      <div className="flex-1 content-center bg-slate-100 pt-8 md:pt-0 text-center md:text-left">
         <img
-          className="flex mt-20 ml-auto mr-64 mb-14"
+          className="mt-10 md:mt- md:ml-auto md:mr-64 mb-10 mx-auto"
           src="/images/Logo.png"
         />
 
-        <button
-          onClick={handleChange}
-          className="flex justify-center ml-auto mr-60 mb-8 pr-20 pl-20 pt-2 pb-2 text-white rounded-md text-base"
-        >
-          <GoogleLogin
-            onSuccess={(credentialResponse) => {
-              const credentialResponseDecoded = jwtDecode(
-                credentialResponse.credential
-              );
-              setFormData({
-                name: credentialResponseDecoded.name,
-                email: credentialResponseDecoded.email,
-              });
+        <div className="flex justify-center md:justify-center">
+          <button
+            onClick={handleChange}
+            className="mb-6 pr-16 pl-16 md:pr-20 md:pl-20 pt-2 pb-2 text-white rounded-md text-base"
+          >
+            <GoogleLogin
+              onSuccess={(credentialResponse) => {
+                const credentialResponseDecoded = jwtDecode(
+                  credentialResponse.credential
+                );
+                setFormData({
+                  name: credentialResponseDecoded.name,
+                  email: credentialResponseDecoded.email,
+                });
 
-              console.log({ credentialResponseDecoded });
-            }}
-            onError={() => {
-              console.log("login failed");
-            }}
-          />
-        </button>
+                console.log({ credentialResponseDecoded });
+              }}
+              onError={() => {
+                console.log("login failed");
+              }}
+            />
+          </button>
+        </div>
 
-        <div className="flex justify-center">
-          <hr className="w-20 inline-flex mt-3  text-gray-900" />
-          <p className="inline-flex text-gray-500 ml-4 ">or Join anonymously</p>
-          <hr className="w-20 inline-flex ml-4 mt-3 mr-8 text-gray-900" />
+        <div className="flex justify-center items-center mt-3 mb-4">
+          <hr className="w-16 md:w-20" />
+          <p className="mx-4 text-gray-500 text-sm md:text-base">or Join anonymously</p>
+          <hr className="w-16 md:w-20" />
         </div>
 
         <form onSubmit={handleSubmit}>
-          <input
-            className="flex justify-center ml-auto mt-9 mr-60 mb-8 pt-1 pb-1 w-80 pl-3 rounded"
-            name="name"
-            type="text"
-            placeholder="Type Your Name"
-            value={formData.name}
-            onChange={handleChange}
-          />
+          <div className="flex flex-col items-center md:block">
+            <input
+              className="mt-4 md:mt-9 mb-4 md:mb-2 pt-2 pb-2 w-72 md:w-80 pl-3 rounded mx-auto md:ml-60 md:mr-60"
+              name="name"
+              type="text"
+              placeholder="Type Your Name"
+              value={formData.name}
+              onChange={handleChange}
+            />
 
-          <input
-            className="flex justify-center ml-auto mt-9 mr-60 mb-8 pt-1 pb-1 w-80 pl-3 rounded"
-            name="email"
-            type="email"
-            placeholder="Type Your Email"
-            onChange={handleChange}
-            value={formData.email}
-          />
+            <input
+              className="mt-4 md:mt-9 mb-4 md:mb-2 pt-2 pb-2 w-72 md:w-80 pl-3 rounded mx-auto md:ml-60 md:mr-60"
+              name="email"
+              type="email"
+              placeholder="Type Your Email"
+              onChange={handleChange}
+              value={formData.email}
+            />
 
-          <input
-            className="flex justify-center ml-auto mt-9 mr-60 mb-8 pt-1 pb-1 w-80 pl-3 rounded"
-            name="password"
-            type="password"
-            placeholder="Type Your Password"
-            onChange={handleChange}
-          />
-          <button
-            onClick={handleChange}
-            className="flex justify-center ml-auto mr-60 mb-8 pr-20 pl-20 pt-2 pb-2 bg-green-400 text-white rounded-md text-base"
-          >
-            <img className="pr-2" src="/images/log-in 1.png" />
-            Join anonymously
-          </button>
+            <input
+              className="mt-4 md:mt-9 mb-4 md:mb-10 pt-2 pb-2 w-72 md:w-80 pl-3 rounded mx-auto md:ml-60 md:mr-60"
+              name="password"
+              type="password"
+              placeholder="Type Your Password"
+              onChange={handleChange}
+            />
+
+            <button
+              onClick={handleChange}
+              className="mt-2 md:mb-8 pr-16 pl-16 md:pr-20 md:pl-20 pt-2 pb-2 bg-green-400 text-white rounded-md text-base mx-auto md:ml-auto md:mr-60 flex items-center justify-center"
+            >
+              <img className="pr-2" src="/images/log-in 1.png" />
+              Join anonymously
+            </button>
+          </div>
         </form>
 
-        <p className="ml-72">
+        <p className="mt-4 md:ml-72 text-sm md:text-base">
           Have an account?
           <Link className="text-blue-900" to="/">
             {" "}
@@ -133,6 +140,7 @@ function SignUp() {
       </div>
     </div>
   );
+
 }
 
 export default SignUp;

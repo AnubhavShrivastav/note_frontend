@@ -201,87 +201,96 @@ function Home() {
   };
 
   return (
-    <div className="flex  h-screen bg-white ">
-      <div className="w-28 bg-slate-50 shadow-md flex flex-col items-center py-6">
-        <button className="mb-52 ml-5">
+    <div className="flex flex-col md:flex-row min-h-screen bg-white">
+      {/* Sidebar */}
+      <div className="w-full md:w-28 bg-slate-50 shadow-md flex flex-row md:flex-col items-center justify-between md:justify-start py-4 md:py-6 px-4 md:px-0">
+        <button className="mb-0 md:mb-52">
           <img src="/images/Logo-3.png" />
         </button>
 
-        <button className="mb-6 -ml-7">
-          <img src="/images/House.png" />
-        </button>
+        <div className="flex md:flex-col items-center gap-4 md:gap-6">
+        <button className=" md:mb-5 ml-3">
+        <img src="/images/home.svg" />
+          </button>
 
-        <button onClick={addNote} className="mb-6 pl-2">
-          <img src="/images/plus.svg" />
-        </button>
+          <button onClick={addNote} className="pl-2">
+            <img src="/images/plus.svg" />
+          </button>
+        </div>
 
-        <button onClick={handleLogout} className="mt-auto ml-3">
+        <button onClick={handleLogout} className="mt-0 md:mt-auto md:ml-3">
           <img src="/images/log-out.svg" />
         </button>
       </div>
 
-      <div className="mt-5 ml-36">
-        {/* <a href="#">
-        <img className="mr-1 mt-2" src="/images/search.png" />
-      </a> */}
-        <input
-          className="w-full max-w-lg px-2 py-2  rounded-lg focus:outline-none focus:ring-2 focus:ring-gray-300"
-          type="text"
-          placeholder="Search Notes"
-          value={search}
-          onChange={(e) => setSearch(e.target.value)}
-        />
+      {/* Main Content */}
+      <div className="flex-1 p-4 md:ml-10">
+        {/* Search Bar */}
+        <div className="mt-4 md:mt-5">
+          <input
+            className="w-full max-w-lg px-4 py-2 rounded-lg focus:outline-none focus:ring-2 focus:ring-gray-300"
+            type="text"
+            placeholder="Search Notes"
+            value={search}
+            onChange={(e) => setSearch(e.target.value)}
+          />
+        </div>
 
-        {/* <a href="">
-        <img className="flex ml-96" src="/images/Dark Mode.png" />
-      </a> */}
-      </div>
+        {/* Greeting */}
+        <div className="mt-6 md:mt-10">
+          <h1 className="text-xl md:text-3xl mb-1 md:mb-2">
+            Hello,{" "}
+            <span className="font-bold">{user ? user : "Guest"}!</span> 👋🏻
+          </h1>
+          <p className="text-gray-700 text-sm md:text-base">
+            All your notes are here, in one place!
+          </p>
+        </div>
 
-      <div className="mt-28 -ml-48">
-        <h1 className="text-3xl mb-2">
-          Hello,{" "}
-          <p className="font-bold inline-block">{user ? user : "Guest"}!</p>👋🏻
-        </h1>
-        <p className="text-gray-700">All your notes are here, in one place!</p>
-      </div>
+        {/* Notes Grid */}
+        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6 mt-10">
+          {notes
+            .filter((note) =>
+              note.description.toLowerCase().includes(search.toLowerCase())
+            )
+            .map((note) => (
+              <div key={note._id}>
+                <textarea
+                  className={`w-full h-48 px-4 py-3 resize-none ${note.color} rounded-md block mb-2`}
+                  placeholder="Write your note..."
+                  value={note.description}
+                  onChange={(e) => updateNote(note._id, e.target.value)}
+                />
 
-      <div className="grid grid-cols-4 gap-16 mt-56 -ml-80">
-        {notes
-          .filter((note) =>
-            note.description.toLowerCase().includes(search.toLowerCase())
-          )
-          .map((note) => (
-            <div key={note._id}>
-              <textarea
-                className={`w-52 h-48 pl-5 pr-5 pt-4 pb-2 mb-1 resize-none ${note.color} rounded-md block`}
-                placeholder="Write your note..."
-                value={note.description}
-                onChange={(e) => updateNote(note._id, e.target.value)} //Updates the correct note
-              >
-                {note.description}
-              </textarea>
+                <div className="flex items-center gap-3">
+                  <button onClick={() => deleteNote(note._id)}>
+                    <img src="/images/trash-2.svg" />
+                  </button>
 
-              <button onClick={() => deleteNote(note._id)}>
-                <img src="/images/trash-2.svg" />
-              </button>
+                  <button
+                    onClick={() =>
+                      saveNote(note._id, note.description, note.color)
+                    }
+                  >
+                    <img src="/images/save.svg" />
+                  </button>
 
-              <button
-                onClick={() => saveNote(note._id, note.description, note.color)}
-              >
-                <img src="/images/save.svg" />
-              </button>
-
-              <button
-                onClick={() => updateNoteInDB(note._id, note.description)}
-                disabled={loading}
-              >
-                <img src="/images/edit.png" className="h-6 ml-1" />
-              </button>
-            </div>
-          ))}
+                  <button
+                    onClick={() =>
+                      updateNoteInDB(note._id, note.description)
+                    }
+                    disabled={loading}
+                  >
+                    <img src="/images/edit.png" className="h-6" />
+                  </button>
+                </div>
+              </div>
+            ))}
+        </div>
       </div>
     </div>
   );
+
 }
 
 export default Home;
