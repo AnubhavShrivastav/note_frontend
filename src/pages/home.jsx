@@ -209,7 +209,7 @@ function Home() {
         </button>
 
         <div className="flex md:flex-col items-center gap-4 md:gap-6">
-        <button className=" md:mb-5 ml-3">
+        <button className="md:mb-5 ml-3">
         <img src="/images/home.svg" />
           </button>
 
@@ -228,7 +228,7 @@ function Home() {
         {/* Search Bar */}
         <div className="mt-4 md:mt-5">
           <input
-            className="w-full max-w-lg px-4 py-2 rounded-lg focus:outline-none focus:ring-2 focus:ring-gray-300"
+            className="w-full max-w-lg px-4 py-2 rounded-lg outline outline-2 outline-gray-300 focus:outline-gray-300"
             type="text"
             placeholder="Search Notes"
             value={search}
