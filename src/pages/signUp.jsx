@@ -1,4 +1,3 @@
-import React from "react";
 import { useState } from "react";
 import { GoogleLogin } from "@react-oauth/google";
 import { jwtDecode } from "jwt-decode";
@@ -28,7 +27,7 @@ function SignUp() {
     }
 
     try {
-      const res = await axios.post("http://localhost:3000/users", formData);
+      const res = await axios.post(`${import.meta.env.VITE_API_URL}/users`, formData);
       const { token, user } = res.data; // Receive token and user data from backend
       localStorage.setItem("Token", token); // Store token in localStorage
       localStorage.setItem("user", JSON.stringify(user)); // Store user data in localStorage
