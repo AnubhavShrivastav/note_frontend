@@ -49,10 +49,7 @@ function Home() {
     );
   };
 
-  // Function to delete a note
-  // const deleteNote = (id) => {
-  //   setNotes(notes.filter((note) => note.id !== id));
-  // };
+  
 
   //  Fetch notes from MongoDB when the page loads (GET API)
   useEffect(() => {
@@ -66,7 +63,7 @@ function Home() {
       }
 
       try {
-        const res = await API.get("http://localhost:3000/notes", {
+        const res = await API.get("/notes", {
           headers: {
             Authorization: `Bearer ${token}`,
             "Content-Type": "application/json",
@@ -76,7 +73,6 @@ function Home() {
         setNotes(filteredNotes);
 
         console.log("📄 Notes from DB:", res.data); // Debugging
-        setNotes(res.data);
       } catch (err) {
         console.error("❌ Error fetching notes:", err);
       }
@@ -103,7 +99,7 @@ function Home() {
 
     try {
       const res = await API.post(
-        "http://localhost:3000/notes",
+        "/notes",
         { description: content, createdAt: date, color },
         {
           headers: {
@@ -132,7 +128,7 @@ function Home() {
     try {
       setLoading(true);
       const res = await API.put(
-        `http://localhost:3000/notes/${_id}`,
+        `/notes/${_id}`,
         { description: content },
         {
           headers: {
@@ -165,9 +161,10 @@ function Home() {
     const token = localStorage.getItem("Token");
 
     try {
-      const res = await API.delete(`http://localhost:3000/notes/${_id}`, {
+      const res = await API.delete(`/notes/${_id}`, {
         headers: {
-          Authorization: `Bearer ${token}, "Content-Type": "application/json" `,
+          Authorization: `Bearer ${token}`,
+          "Content-Type": "application/json" ,
         },
       });
       setNotes((prevNotes) => prevNotes.filter((note) => note._id !== _id));
